@@ -77,9 +77,18 @@ export function ConversationalInterface({
 
   const startListening = () => {
     if (recognition) {
+      console.log("Starting speech recognition...");
       setIsListening(true);
       setCurrentTranscript("");
-      recognition.start();
+      try {
+        recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        setIsListening(false);
+      }
+    } else {
+      console.error("Speech recognition not available");
+      alert("Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.");
     }
   };
 
@@ -161,17 +170,36 @@ export function ConversationalInterface({
   useEffect(() => {
     if (recognition) {
       recognition.onresult = (event: any) => {
+        console.log("Speech recognition result:", event);
         const transcript = Array.from(event.results)
           .map((result: any) => result[0].transcript)
           .join('');
+        console.log("Transcript:", transcript);
         setCurrentTranscript(transcript);
       };
 
       recognition.onend = () => {
+        console.log("Speech recognition ended, transcript:", currentTranscript);
         setIsListening(false);
         if (currentTranscript.trim()) {
           processUserInput(currentTranscript.trim());
         }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          alert("Microphone access denied. Please allow microphone access and try again.");
+        } else if (event.error === 'no-speech') {
+          console.log("No speech detected, please try again");
+        } else {
+          alert(`Speech recognition error: ${event.error}`);
+        }
+      };
+
+      recognition.onstart = () => {
+        console.log("Speech recognition started");
       };
     }
   }, [currentTranscript, currentStep, responses]);
