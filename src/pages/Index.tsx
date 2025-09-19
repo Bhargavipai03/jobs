@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConversationalInterface } from "@/components/ConversationalInterface";
 import { disabilityAssessmentFlow, jobSeekerProfileFlow, employerJobPostingFlow, parseConversationData } from "@/components/ConversationFlows";
 import { ConversationalJobMatching } from "@/components/ConversationalJobMatching";
-import { EmployerPortal } from "@/components/EmployerPortal";
+import { SwipeJobMatching } from "@/components/SwipeJobMatching";
+import { EnhancedEmployerPortal } from "@/components/EnhancedEmployerPortal";
 import { Accessibility, Users, Building, Globe, Award, Mic, Volume2, VolumeX } from "lucide-react";
 
 type UserType = "job-seeker" | "employer" | null;
@@ -273,7 +274,7 @@ const Index = () => {
   // Job Matching Dashboard (with voice guidance)
   if (currentStep === "dashboard") {
     return (
-      <ConversationalJobMatching
+      <SwipeJobMatching
         userProfile={userData.profileData}
         disabilityData={userData.disabilityData}
       />
@@ -295,7 +296,7 @@ const Index = () => {
   // Employer Portal
   if (currentStep === "employer-portal") {
     return (
-      <EmployerPortal />
+      <EnhancedEmployerPortal />
     );
   }
 
