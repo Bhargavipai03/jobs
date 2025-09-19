@@ -40,15 +40,19 @@ export function ConversationalInterface({
   const [isComplete, setIsComplete] = useState(false);
 
   const recognition = useState(() => {
+    console.log("Initializing speech recognition...");
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognitionClass();
       recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = language;
+      console.log("Speech recognition initialized successfully");
       return recognition;
+    } else {
+      console.error("Speech recognition not supported in this browser");
+      return null;
     }
-    return null;
   })[0];
 
   const currentStep = steps.find(step => step.id === currentStepId);
@@ -275,36 +279,47 @@ export function ConversationalInterface({
 
               {/* Voice Controls */}
               <div className="flex justify-center gap-4">
-                <Button
-                  variant={isListening ? "voice" : "default"}
-                  size="lg"
-                  onClick={isListening ? stopListening : startListening}
-                  disabled={isSpeaking}
-                  className="gap-2"
-                >
-                  {isListening ? (
-                    <>
-                      <MicOff className="h-5 w-5" />
-                      Stop Listening
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="h-5 w-5" />
-                      Speak Your Answer
-                    </>
-                  )}
-                </Button>
+                {!recognition && (
+                  <div className="bg-destructive/10 p-4 rounded-lg text-center">
+                    <p className="text-destructive font-medium">Speech Recognition Not Supported</p>
+                    <p className="text-sm text-muted-foreground">Please use Chrome, Edge, or Safari browser</p>
+                  </div>
+                )}
+                
+                {recognition && (
+                  <>
+                    <Button
+                      variant={isListening ? "voice" : "default"}
+                      size="lg"
+                      onClick={isListening ? stopListening : startListening}
+                      disabled={isSpeaking}
+                      className="gap-2"
+                    >
+                      {isListening ? (
+                        <>
+                          <MicOff className="h-5 w-5" />
+                          Stop Listening
+                        </>
+                      ) : (
+                        <>
+                          <Mic className="h-5 w-5" />
+                          Speak Your Answer
+                        </>
+                      )}
+                    </Button>
 
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => speak(currentStep.question)}
-                  disabled={isSpeaking}
-                  className="gap-2"
-                >
-                  <Volume2 className="h-5 w-5" />
-                  Repeat Question
-                </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => speak(currentStep.question)}
+                      disabled={isSpeaking}
+                      className="gap-2"
+                    >
+                      <Volume2 className="h-5 w-5" />
+                      Repeat Question
+                    </Button>
+                  </>
+                )}
               </div>
 
               {/* Live Transcript */}
